@@ -5,7 +5,7 @@ import CalcContext from '../context/CalcContext';
 
 function Key({color, text, span, func}) {
 
-  const {numFunc,clearAll,clear,back,dot,opFunc} = useContext(CalcContext);
+  const {numFunc,clearAll,clear,back,dot,opFunc,displaySolution} = useContext(CalcContext);
 
   const operator = ['+', '-', 'X', '/'];
 
@@ -22,7 +22,7 @@ function Key({color, text, span, func}) {
     } else if(operator.includes(text)) {
       opFunc(text);
     } else if(text === '=') {
-
+      displaySolution();
     } else if(func ==='back') {
       back();
     } else if(func === 'dot') {

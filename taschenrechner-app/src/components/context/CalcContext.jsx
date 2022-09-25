@@ -7,12 +7,14 @@ export const CalcProvider = ({children}) => {
     const [prevText, setPrevText] = useState();
     const [operator, setOperator] = useState();
     const [isOperating, setIsOperating] = useState(false);
+    const [solution, setSolution] = useState(false);
 
     const clearAll = () => {
         setAcText(0);
         setPrevText();
         setIsOperating(false);
         setOperator();
+        setSolution(false);
     }
 
     const clear = () => {
@@ -20,6 +22,10 @@ export const CalcProvider = ({children}) => {
     }
 
     const numFunc = (number) => {
+        if(solution && !isOperating) {
+            clearAll();
+        }
+
         if(acText === 0) {
             setAcText(number);
         } else if(acText !== 0) {
@@ -41,29 +47,82 @@ export const CalcProvider = ({children}) => {
         setAcText(acText.toString() + '.');
     }
     
-    const opFunc = (operator) => {
-        console.log("operator")
+    const opFunc = (new_operator) => {
+        if(new_operator === 'X') new_operator = 'x';
         if(!isOperating) {
-            console.log("is not operating")
-            console.log(operator)
-            
-            switch(operator) {
+            switch(new_operator) {
                 case '+':
-                    console.log("+")
                     setOperator('+');
                     setIsOperating(true);
                     setPrevText(acText);
+                    clear();
                     break;
                 case '-':
+                    setOperator('-');
+                    setIsOperating(true);
+                    setPrevText(acText);
+                    clear();
                     break;
                 case '/':
+                    setOperator('/');
+                    setIsOperating(true);
+                    setPrevText(acText);
+                    clear();
                     break;
-                case 'X':
+                case 'x':
+                    setOperator('x');
+                    setIsOperating(true);
+                    setPrevText(acText);
+                    clear();
                     break;            
                 default: return;
             }
+        } else if(isOperating && acText === 0 && new_operator !== operator) {
+            switch(new_operator) {
+                case '+':
+                    setOperator('+');
+                    break;
+                case '-':
+                    setOperator('-');
+                    break;
+                case '/':
+                    setOperator('/');
+                    break;
+                case 'x':
+                    setOperator('x');
+                    break;            
+                default: return;
+            }
+        } else if(isOperating && acText !== 0) {
+            setOperator(new_operator);
+            setIsOperating(true);
+            setPrevText(equals());
+            clear();
         }
     }
+
+    const equals = () => { 
+        switch(operator) {
+            case '+':
+                return(parseInt(prevText, 10) + parseInt(acText, 10));
+            case '-':
+                return(parseInt(prevText, 10) - parseInt(acText, 10));
+            case '/':
+                return(parseInt(prevText, 10) / parseInt(acText, 10));
+            case 'x':
+                return(parseInt(prevText, 10) * parseInt(acText, 10));            
+            default: return;
+        }
+        
+    }
+
+    const displaySolution = (() => {
+      setSolution(true);  
+      clearAll();
+      setAcText(equals());
+      setIsOperating(false);
+    })
+
 
     return (
         <CalcContext.Provider 
@@ -77,6 +136,7 @@ export const CalcProvider = ({children}) => {
                 back,
                 dot,
                 opFunc,
+                displaySolution,
             }}
         >
             {children}
